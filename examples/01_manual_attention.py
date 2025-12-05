@@ -2,6 +2,7 @@
 # Imports
 import sys
 from pathlib import Path
+import os
 
 # Add src to path so we can import from it
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
@@ -15,6 +16,7 @@ from pdb import set_trace
 
 
 if __name__=="__main__":
+
     model, tokenizer, device=load_gpt2()
 
     sentence="Once upon a time there was a bunny"
@@ -34,10 +36,11 @@ if __name__=="__main__":
 
     # 2. Getting Huggingface attention pattenrns:
     # pass the input through the model:
-    model.config.output_attentions = True
     with torch.no_grad():
         outputs=model(**x, output_attentions=True)
+    # getting layer 0 attention
     hf_attn_layer0=outputs.attentions[0] # [batch, n_heads, seq_len, seq_len]
+    # getting attention from batch idx 0, head 0
     hf_attn_head0=hf_attn_layer0[0,0] #[seq, seq] for head 0
 
     # 3. Getting the manual attention pattern
@@ -53,3 +56,10 @@ if __name__=="__main__":
     # print(f"HF attn:\n{hf_attn_head0}")
     # print(f"Manual attn:\n{manual_attn_head0}")
     # print(f"Max diff: {(hf_attn_head0 - manual_attn_head0).abs().max()}")
+
+    from visualization import plot_attention
+
+    # Get token strings for labels
+    tokens = tokenizer.convert_ids_to_tokens(input_ids[0])
+    plot_attention(manual_attn_head0.detach(), tokens,
+                   save_path=os.path.join("outputs", "01_manual_attention_plot.png"))

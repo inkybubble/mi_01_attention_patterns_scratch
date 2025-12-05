@@ -12,14 +12,14 @@ def attention_manual(x, w_q, w_k, w_v, b_q, b_k, b_v, w_o):
     """
     Docstring for attention_manual
     
-    :param x: input [batch, seq_len, d_model]
-    :param w_q: query weights [d_model, d_head]
-    :param w_k: key weights [d_model, d_head]
-    :param w_v: value weights [d_model, d_head]
-    param b_q: query biases [d_model]
-    :param b_k: key biases [d_model]
-    :param b_v: value biases [d_model]
-    :param w_o: projection weights [d_head, d_model]
+    x: input [batch, seq_len, d_model]
+    w_q: query weights [d_model, d_head]
+    w_k: key weights [d_model, d_head]
+    w_v: value weights [d_model, d_head]
+    b_q: query biases [d_model]
+    b_k: key biases [d_model]
+    b_v: value biases [d_model]
+    w_o: projection weights [d_head, d_model]
 
     Returns:
         output: [batch, seq_len, d_model]
