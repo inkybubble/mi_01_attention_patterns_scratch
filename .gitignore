@@ -26,7 +26,6 @@ ENV/
 *.ipynb_checkpoints
 
 # Project specific
-outputs/*.png
 outputs/*.pdf
 
 # Keep outputs directory but ignore generated files

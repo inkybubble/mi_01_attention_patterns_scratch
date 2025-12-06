@@ -44,7 +44,7 @@ if __name__=="__main__":
     n_ctx=config.n_ctx # 1024
     n_embd=config.n_embd # 768
     n_head=config.n_head # 12
-    n_innner=config.n_inner # null
+    n_inner=config.n_inner # null
     n_layer=config.n_layer # 12
     n_position=config.n_positions # 1024
     
@@ -75,7 +75,7 @@ if __name__=="__main__":
     for score, layer, head in scores_sorted[:5]:
         print(f"    Layer {layer}, Head {head}: {score:.4f}")
 
-    # 5. Visualize the best one (i.e. the one that the momst attends to the previous token)
+    # 5. Visualize the best one (i.e. the one that the most attends to the previous token)
     layer_best_prev=scores_sorted[0][1]
     head_best_prev=scores_sorted[0][2]
 

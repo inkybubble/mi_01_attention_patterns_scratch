@@ -30,7 +30,7 @@ def plot_attention(attention_pattern, tokens, save_path=None, title: str=None,
     plt.xticks(ticks=range(len(tokens)), labels=tokens, rotation=45, ha='right')
     plt.yticks(ticks=range(len(tokens)), labels=tokens)
     if title is not None:
-        plt.title=title
+        plt.title(title)
 
     plt.colorbar(im)
     if save_path:
