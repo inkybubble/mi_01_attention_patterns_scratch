@@ -35,9 +35,6 @@ outputs/*.pdf
 .cache/
 *.cache
 
-# uv
-uv.lock
-
 # .md files
 TODO.md
 PLAN.md
