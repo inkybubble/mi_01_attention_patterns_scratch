@@ -17,7 +17,7 @@ uv run python examples/01_manual_attention.py
 
 <img src="outputs/01_manual_attention_plot.png" width="400">
 
-*Attention pattern for Layer 0, Head 0. The lower triangular structure shows the causal mask  tokens can only attend to past positions.*
+*Attention pattern for Layer 0, Head 0. The lower triangular structure shows the causal mask: tokens can only attend to past positions.*
 
 ---
 
@@ -40,7 +40,7 @@ uv run python examples/02_previous_token.py
 
 <img src="outputs/02_best_head_at_previous_token_attention.png" width="400">
 
-*Layer 4, Head 11 shows near-perfect diagonal attention  each token attends almost exclusively to the previous token.*
+*Layer 4, Head 11 shows near-perfect diagonal attention: each token attends almost exclusively to the previous token.*
 
 ---
 
@@ -63,7 +63,7 @@ uv run python examples/03_induction_heads.py
 
 <img src="outputs/03_best_head_at_induction.png" width="500">
 
-*Layer 5, Head 1 on repeated text "The cat sat on the mat. The cat sat on the mat"  the second occurrence of each token attends to what followed its first occurrence.*
+*Layer 5, Head 1 on repeated text "The cat sat on the mat. The cat sat on the mat": the second occurrence of each token attends to what followed its first occurrence.*
 
 ---
 
@@ -87,7 +87,7 @@ uv run python examples/04_qk_ov_circuits.py
 |:---------------------:|:---------------------------:|
 | <img src="outputs/04_ov_eigenvalues_complex_best_induction.png" width="300"> | <img src="outputs/04_ov_eigenvalues_complex_best_prev_token.png" width="300"> |
 
-*Polar plots of OV circuit eigenvalues. L4H11's eigenvalues cluster on the positive real axis (0�) indicating copying behavior, while L5H1's eigenvalues are scattered, indicating more complex information transformation.*
+*Polar plots of OV circuit eigenvalues. L4H11's eigenvalues cluster on the positive real axis (0 degrees) indicating copying behavior, while L5H1's eigenvalues are scattered, indicating more complex information transformation.*
 
 ---
 
@@ -98,7 +98,7 @@ uv run python examples/04_qk_ov_circuits.py
 | Previous-Token | L4H11 | Copies information from position i-1 to position i |
 | Induction | L5H1 | Pattern-matches repeated sequences for in-context learning |
 
-The **induction head** (L5H1) builds on the **previous-token head** (L4H11)  this is why induction heads appear in later layers. Together, they form the core mechanism for in-context learning in transformers.
+The **induction head** (L5H1) builds on the **previous-token head** (L4H11): this is why induction heads appear in later layers. Together, they form the core mechanism for in-context learning in transformers.
 
 ## Setup
 
