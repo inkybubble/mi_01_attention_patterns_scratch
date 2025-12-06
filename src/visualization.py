@@ -1,6 +1,7 @@
 # %%
 # Imports
 import matplotlib.pyplot as plt
+import torch
 
 from pdb import set_trace
 
@@ -16,10 +17,11 @@ def plot_attention(attention_pattern, tokens, save_path=None, title: str=None,
     attention_pattern: [seq_len, seq_len] tensor
     tokens: list of token string (for axis labels)
     save_path: optional path to save a .png file
+    title: plot title
     '''
     if dark is True:
         plt.style.use('dark_background')
-    fig, ax=plt.subplots() # for when creading a figure - plt.plot() works only for line plots
+    fig, ax=plt.subplots() # for when creating a figure - plt.plot() works only for line plots
     ap_np=attention_pattern.cpu().numpy()
     
     c_min=ap_np.min()
@@ -35,6 +37,33 @@ def plot_attention(attention_pattern, tokens, save_path=None, title: str=None,
     plt.colorbar(im)
     if save_path:
         plt.savefig(save_path, bbox_inches='tight')
+    else:
+        plt.show()
+    plt.close()
+
+def plot_polar(eig_vals, title: str=None, save_path=None,dark: bool=True):
+    '''
+    Docstring for plot_polar
+    
+    Args:
+        eig_vals: circuit eigenvalues
+        save_path: optional path to save a .png file
+        title: plot title
+    '''
+
+    if dark is True:
+        plt.style.use('dark_background')
+
+    theta = torch.angle(eig_vals).cpu().detach().numpy()
+    r = torch.abs(eig_vals).cpu().detach().numpy()
+
+    fig, ax = plt.subplots(subplot_kw={'projection': 'polar'})
+    ax.scatter(theta, r)
+    ax.set_rscale('log')
+    if title is not None:
+        ax.set_title(title)
+    if save_path is not None:
+        plt.savefig(save_path)
     else:
         plt.show()
     plt.close()

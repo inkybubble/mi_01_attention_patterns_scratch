@@ -7,10 +7,8 @@ import os
 # Add src to path so we can import from it
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-import transformers
 import torch
-from model_loader import load_gpt2, extract_head_weights
-from attention_manual import attention_manual
+from model_loader import load_gpt2
 
 from pdb import set_trace
 
@@ -58,12 +56,12 @@ if __name__=="__main__":
             attn_dict[layer_idx].append(hf_attn_head)
     
     # 3. compute the "previous token score" for each head
-    '''For a "previous token head', the attention pattern has high value on the diagonal just below the main diagonal (position i attentds to position i-1)'''
+    '''For a "previous token head', the attention pattern has high value on the diagonal just below the main diagonal (position i attends to position i-1)'''
     scores=[] # list of (score, layer_idx, head_idx)
     for layer_idx in range(n_layer):
         for head_idx in range(n_head):
             attn=attn_dict[layer_idx][head_idx]
-            # attn[1:, :-1]: slice ros 1 onwards, columns 0 to second last
+            # attn[1:, :-1]: slice rows 1 onwards, columns 0 to second last
             # diagonal grabs the diagonal() of the sliced matrix
             prev_token_score=attn[1:, :-1].diagonal().mean()
             scores.append((prev_token_score.item(),layer_idx,head_idx))
@@ -75,7 +73,7 @@ if __name__=="__main__":
     for score, layer, head in scores_sorted[:5]:
         print(f"    Layer {layer}, Head {head}: {score:.4f}")
 
-    # 5. Visualize the best one (i.e. the one that the most attends to the previous token)
+    # 5. Visualize the best one (i.e. the one that most attends to the previous token)
     layer_best_prev=scores_sorted[0][1]
     head_best_prev=scores_sorted[0][2]
 
@@ -90,6 +88,6 @@ if __name__=="__main__":
     plot_attention(attn_dict[layer_best_prev][head_best_prev].detach(), tokens,
                    title=msg_best_prev_head,
                    save_path=os.path.join("outputs", "02_best_head_at_previous_token_attention.png"))
-    '''These PREVIOUS-TOKEN HEADS have strong diagonal patterns just below the main diagonal, i.e. in the attention matrix the entry [i, i-1] is high - 'token i attents to token i-1'
+    '''These PREVIOUS-TOKEN HEADS have strong diagonal patterns just below the main diagonal, i.e. in the attention matrix the entry [i, i-1] is high - 'token i attends to token i-1'
     In the `A Mathematical Framework for Transformer Circuits` they mention that they help copying info from the previous token, which in turn is a building block for more complex behaviours like induction heads
     '''

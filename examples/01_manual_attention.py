@@ -7,14 +7,13 @@ import os
 # Add src to path so we can import from it
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-import transformers
 import torch
 from model_loader import load_gpt2, extract_head_weights
 from attention_manual import attention_manual
 
 from pdb import set_trace
 
-
+# %%
 if __name__=="__main__":
 
     model, tokenizer, device=load_gpt2()
@@ -34,7 +33,7 @@ if __name__=="__main__":
     embeddings_normed=ln_1(embeddings)
 
 
-    # 2. Getting Huggingface attention pattenrns:
+    # 2. Getting Huggingface attention patterns:
     # pass the input through the model:
     with torch.no_grad():
         outputs=model(**x, output_attentions=True)

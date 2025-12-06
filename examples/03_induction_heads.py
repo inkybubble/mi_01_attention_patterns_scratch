@@ -7,10 +7,8 @@ import os
 # Add src to path so we can import from it
 sys.path.insert(0, str(Path(__file__).parent.parent / "src"))
 
-import transformers
 import torch
-from model_loader import load_gpt2, extract_head_weights
-from attention_manual import attention_manual
+from model_loader import load_gpt2
 
 from pdb import set_trace
 
@@ -30,7 +28,7 @@ def find_repeated_positions(tokens):
     for idx, token in enumerate(tokens):
         positions[token].append(idx)
 
-    # We're keeping the tokens that appear more than ones
+    # We're keeping the tokens that appear more than once
     repeated = {tok: pos for tok, pos in positions.items() if len(pos)> 1}
     return repeated
 
@@ -38,14 +36,14 @@ def compute_induction_score(attn, repeated_positions):
     '''
     Args:
         attn: attention
-        repeated position: for repeated tokens, their position
+        repeated_positions: for repeated tokens, their position
     Returns: induction scores for each head
     '''
     score=0.
     for token in repeated_positions:
         # induction means
         # given "The cat sat on the mat. The cat sat on the mat
-        # "second "cat" attends to what followed first "cat" (i.e., "sat")"
+        # second "cat" attends to what followed first "cat" (i.e., "sat")
         score+=attn[repeated_positions[token][1], repeated_positions[token][0]+1].item()
     score/=len(repeated_positions)
     return score
@@ -56,9 +54,9 @@ def compute_induction_score(attn, repeated_positions):
 if __name__=="__main__":
     '''
 
-    This example investigates INDUCTIVE HEADS:
+    This example investigates INDUCTION HEADS:
     They perform the logic "I saw [A][B] earlier in this context. Now I see [A] again. I induce (infer) that [B] will follow."
-    This counts as a learning pattern from a single example within the context - not from training data, but from that specific prompts. In the Anthropic paper "A Mathematical Framework for Transformer Circuits" this is considered a core mechanism of in-context learning - the model doesn't retrieve memorized facts; it's inducing patterns on-the-fly. They're also called "copying heads" or "in-context learning head", but the paper popularized the name "induction head", because of their behaviour of "reasoning-from-examples".
+    This is a learning pattern from a single example within the context - not from training data, but from that specific prompt. In the Anthropic paper "A Mathematical Framework for Transformer Circuits" this is considered a core mechanism of in-context learning - the model doesn't retrieve memorized facts; it's inducing patterns on-the-fly. They're also called "copying heads" or "in-context learning head", but the paper popularized the name "induction head", because of their behaviour of "reasoning-from-examples".
     1. Uses a repeated-pattern prompt
     2. Gets attention for all heads
     3. Computes an "induction score" — how much the second occurrence of a token attends to what followed the first occurrence
@@ -66,7 +64,7 @@ if __name__=="__main__":
     5. Visualize the best one (i.e. the head with the highest induction score)
     '''
 
-    # 0. Setting up the model, tokenizer and input
+    # 0. Setting up the model, tokenizer
     model, tokenizer, device=load_gpt2()
 
     # 1. Using a repeated pattern. In `A Mathematical Framework for Transformer Circuits` they use "totally random repeated patterns"
