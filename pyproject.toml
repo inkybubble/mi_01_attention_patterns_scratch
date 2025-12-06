@@ -1,7 +1,7 @@
 [project]
 name = "mi-01-attention-patterns-scratch"
 version = "0.1.0"
-description = "Add your description here"
+description = "MI-01 - Attention Patterns from Scratch: Finding Previous-Token and Induction Heads in GPT-2"
 readme = "README.md"
 requires-python = ">=3.12"
 dependencies = [
