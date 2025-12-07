@@ -89,6 +89,21 @@ uv run python examples/04_qk_ov_circuits.py
 
 *Polar plots of OV circuit eigenvalues. L4H11's eigenvalues cluster on the positive real axis (0 degrees) indicating copying behavior, while L5H1's eigenvalues are scattered, indicating more complex information transformation.*
 
+#### Full OV Circuit (with Embeddings)
+
+The basic OV circuit operates in residual stream space. But the paper also analyzes the **full circuit** including embedding and unembedding matrices: `W_U @ W_OV @ W_E.T`. This [n_vocab, n_vocab] matrix directly answers: "If token X is attended to, how much does it increase the logit for token Y?"
+
+| Head | Basic OV Score | Full OV Score | Change |
+|------|---------------|---------------|--------|
+| L5H1 | 0.41 | **0.58** | +0.17 |
+| L4H11 | 0.96 | **0.96** | 0 |
+
+| L5H1 (Full OV) | L4H11 (Full OV) |
+|:--------------:|:---------------:|
+| <img src="outputs/04_full_ov_eigenvalues_L5H1.png" width="300"> | <img src="outputs/04_full_ov_eigenvalues_L4H11.png" width="300"> |
+
+The induction head's copying score increases when we include embeddings: its job is to copy *token identity*, and the embedding matrices connect residual stream directions to actual tokens. L4H11 remains unchanged: it was already a near-pure copier in residual stream space.
+
 ---
 
 ## Key Discoveries

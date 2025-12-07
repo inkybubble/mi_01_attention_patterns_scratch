@@ -143,3 +143,62 @@ if __name__=="__main__":
     plot_polar(eigenvalues_ov, title=title_polar_ov, save_path=save_path_polar_ov)
     meaningful = eigenvalues_ov.abs() > 0.01  # threshold
     print(f"Non-zero eigenvalues (L4H11): {meaningful.sum()}")  # should be ~64
+
+    # 9. Full OV Circuit with Embeddings
+    '''
+    So far we computed w_ov = w_v @ w_o in residual stream space [n_embd, n_embd].
+    But the paper also analyzes the FULL circuit with embeddings:
+
+        full_ov: w_u @ w_ov @ w_e.T  [n_vocab, n_vocab]
+        
+    This directly answers: "If token X is attended to, how much does it
+    increase the logit for token Y?"
+    
+    For copying heads, the diagonal should be large and positive (tokens boost their own logits).
+    
+    The full matrix is [50257, 50257], which is massive. But since w_ov is rank d_head (64), the full circuit also has only 64 non-zero eigenvalues.
+    
+    Trick: eigenvalues(AB) = eigenvalues(BA) for non-zero eigenvalues.
+    So we compute eigenvalues of w_e.T @ w_u @ w_ov which is [n_embd, n_embd].
+    '''
+
+    w_e = model.transformer.wte.weight  # [n_vocab, n_embd]
+    w_u = model.lm_head.weight          # [n_vocab, n_embd]
+    n_vocab = config.vocab_size
+    print(f"\nw_e shape: {w_e.shape} # [n_vocab, n_embd] = [{n_vocab}, {n_embd}]")
+    print(f"w_u shape: {w_u.shape} # [n_vocab, n_embd] = [{n_vocab}, {n_embd}]")
+
+    # L5H1 (induction head) - full OV circuit
+    layer_idx = 5
+    head_idx = 1
+    w_q, w_k, w_v, b_q, b_k, b_v, w_o = extract_head_weights(model, layer=layer_idx, head=head_idx)
+    w_ov = w_v @ w_o
+
+    # eigenvalues(w_u @ w_ov @ w_e.T) = eigenvalues(w_e.T @ w_u @ w_ov)
+    full_ov_efficient = (w_e.T @ w_u @ w_ov).cpu()
+    eigenvalues_full_ov, _ = torch.linalg.eig(full_ov_efficient)
+
+    copying_score_full = torch.sum(eigenvalues_full_ov.real) / torch.sum(torch.abs(eigenvalues_full_ov))
+    print(f"\nFull OV Circuit (with w_e, w_u) - L{layer_idx}H{head_idx}:")
+    print(f"  Copying score: {copying_score_full:.2f}")
+
+    title_full_ov = "Full OV Circuit Eigenvalues - L5H1 (with W_E, W_U)"
+    save_path_full_ov = os.path.join("outputs", "04_full_ov_eigenvalues_L5H1.png")
+    plot_polar(eigenvalues_full_ov, title=title_full_ov, save_path=save_path_full_ov)
+
+    # L4H11 (prev token head) - full OV circuit
+    layer_idx = 4
+    head_idx = 11
+    w_q, w_k, w_v, b_q, b_k, b_v, w_o = extract_head_weights(model, layer=layer_idx, head=head_idx)
+    w_ov = w_v @ w_o
+
+    full_ov_efficient = (w_e.T @ w_u @ w_ov).cpu()
+    eigenvalues_full_ov, _ = torch.linalg.eig(full_ov_efficient)
+
+    copying_score_full = torch.sum(eigenvalues_full_ov.real) / torch.sum(torch.abs(eigenvalues_full_ov))
+    print(f"\nFull OV Circuit (with w_e, w_u) - L{layer_idx}H{head_idx}:")
+    print(f"  Copying score: {copying_score_full:.2f}")
+
+    title_full_ov = "Full OV Circuit Eigenvalues - L4H11 (with W_E, W_U)"
+    save_path_full_ov = os.path.join("outputs", "04_full_ov_eigenvalues_L4H11.png")
+    plot_polar(eigenvalues_full_ov, title=title_full_ov, save_path=save_path_full_ov)
